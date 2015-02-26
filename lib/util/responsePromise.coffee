@@ -91,4 +91,4 @@ response.Promise.reject = (val) ->
 responsePromise.promise = (func) ->
 	make Q.Promise func
 
-responsePromise
+return responsePromise
