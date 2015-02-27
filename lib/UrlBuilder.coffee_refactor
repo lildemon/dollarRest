@@ -1,0 +1,96 @@
+
+mixin = require('./util/mixin')
+urlRE = /([a-z][a-z0-9\+\-\.]*:)\/\/([^@]+@)?(([^:\/]+)(:([0-9]+))?)?(\/[^?#]*)?(\?[^#]*)?(#\S*)?/i
+absoluteUrlRE = /^([a-z][a-z0-9\-\+\.]*:\/\/|\/)/i
+fullyQualifiedUrlRE = /([a-z][a-z0-9\+\-\.]*:)\/\/([^@]+@)?(([^:\/]+)(:([0-9]+))?)?\//i
+
+###
+Apply params to the template to create a URL.
+Parameters that are not applied directly to the template, are appended
+to the URL as query string parameters.
+@param {string} template the URI template
+@param {Object} params parameters to apply to the template
+@return {string} the resulting URL
+###
+buildUrl = (template, params) ->
+	url = template
+	queryStringParams = {}
+
+	if params
+		for name, val of params
+			re = new RegExp('\\{' + name + '\\}')
+			if re.text url
+				url = url.replace re, encodeURIComponent(params[name]), 'g'
+			else
+				queryStringParams[name] = val
+
+		for name, val of queryStringParams
+			url += if url.indexOf('?') is -1 then '?' else '&'
+			url += encodeURIComponent name
+			url += "=#{encodeURIComponent(val)}" if val?
+
+	url
+
+startsWith = (str, test) ->
+	str.indexOf test is 0
+
+###
+Create a new URL Builder
+@param {string|UrlBuilder} template the base template to build from, may be
+ another UrlBuilder
+@param {Object} [params] base parameters
+@constructor
+###	
+origin = ''
+
+UrlBuilder = class
+	constructor: (template, params) ->
+		unless this instanceof UrlBuilder
+			return new UrlBuilder template, params
+
+		if template instanceof UrlBuilder
+			@_template = template.template
+			@_params = mixin {}, @_params, params
+		else
+			@_template = (template or '').toString()
+			@_params = params or {}
+
+	###
+	Create a new UrlBuilder instance that extends the current builder.
+	The current builder is unmodified.
+	@param {string} [template] URL template to append to the current 
+	template
+	@param {Object} [params] params to combine with current params.  New 
+	params override existing params
+	@return {UrlBuilder} the new builder
+	###
+
+	append: (template, params) ->
+		# TODO consider query strings and fragments
+		new UrlBuilder @_template + template, mixin({}, @_params, params)
+
+	fullyQualify: ->
+		return this unless location?
+		return this if @isFullyQualified()
+
+		template = @_template
+
+		if startsWith template, '//'
+			template = origin.protocol + template
+		else if startsWith template, '/'
+			template = origin.origin + template
+		else if not @isAbsolute()
+			template = origin.origin + origin.pathname.substring(0, origin.pathname.lastIndexOf('/') + 1)
+
+		if template.indexOf('/', 8) is -1
+			# default the pathname to '/'
+			template = template + '/'
+
+		new UrlBuilder template, @_params
+
+	isAbsolute: ->
+		
+
+origin = if location? then new UrlBuilder(location.href).parts() else undefined
+
+return UrlBuilder

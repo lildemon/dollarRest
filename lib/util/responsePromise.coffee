@@ -78,17 +78,15 @@ make = (promise) ->
 	promise.follow = follow
 	promise
 
-responsePromise = (val, thens...)->
+responsePromise = module.exports = (val, thens...)->
 	# Q.Promise.resolve == Q ~= Promise.resolve
 	p = Q(val)
 	make p.then.apply p, thens
 
 responsePromise.make = make
 
-response.Promise.reject = (val) ->
+responsePromise.reject = (val) ->
 	make Q.reject val
 
 responsePromise.promise = (func) ->
 	make Q.Promise func
-
-return responsePromise
