@@ -60,8 +60,8 @@ follow = (rels) ->
 			client
 				params: rel.params
 
-	# when.reduce counterpart will return default promise, not ResponsePromise, so 'make accumedResp' is required, but not in this case
-	accumedResp
+	
+	make accumedResp
 
 ###
 Wrap a Promise as an ResponsePromise
