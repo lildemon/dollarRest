@@ -3,10 +3,11 @@ $ = require('jquery')
 client = module.exports = require('./ajaxClient')
 
 # builtin interceptors
+client.interceptors = {}
+for interceptor in ['mime', 'pathPrefix', 'retry']
+	client.interceptors[interceptor] = require('./interceptor/' + interceptor)
 
-#alert('hello')
-mime = require('./interceptor/mime')
-
+#mime = require('./interceptor/mime')
 #client = client.wrap mime
 
 
