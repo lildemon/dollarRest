@@ -58,6 +58,8 @@ interceptor = (handlers) ->
 
 			request.originator = request.originator or interceptedClient
 
+			request.ajaxConfig = request.ajaxConfig or {}
+
 			return responsePromise(
 				requestHandler.call(context, request, config, meta),
 				(request) ->

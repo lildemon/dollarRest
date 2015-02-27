@@ -1,0 +1,1 @@
+# TODO set request.ajaxConfig object to support $.ajax library's jsonp
