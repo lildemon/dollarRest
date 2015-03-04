@@ -10,18 +10,10 @@ avaliableInterceptors = [
 	'retry'
 	'csrf'
 	'noCache'
+	'timeout'
 ]
 
 for interceptor in avaliableInterceptors
 	client.interceptors[interceptor] = require('./interceptor/' + interceptor)
 
-window.client = client 
-
-mime = require('./interceptor/mime')
-noCache = require('./interceptor/noCache')
-client = client.wrap(mime).wrap(noCache)
-
-
-
-client('/test.json').done (res) ->
-	console?.log res
+client.interceptors.mime.registry = require('./mime/registry')

@@ -56,6 +56,7 @@ interceptor = (handlers) ->
 			# TODO $.ajax use url property instead of path?
 			request = if typeof request is 'string' then {path: request} else (request or {})
 
+			# originator is top(out) most wrap of client, the one who callse client({})
 			request.originator = request.originator or interceptedClient
 
 			request.ajaxConfig = request.ajaxConfig or {}

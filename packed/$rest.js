@@ -54,17 +54,30 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Q, client, mime;
+	var $, Q, avaliableInterceptors, client, interceptor, mime, noCache, _i, _len;
 
 	Q = __webpack_require__(1);
 
 	$ = __webpack_require__(2);
 
-	client = __webpack_require__(3);
+	client = module.exports = __webpack_require__(3);
 
-	mime = __webpack_require__(4);
+	client.interceptors = {};
+
+	avaliableInterceptors = ['mime', 'pathPrefix', 'retry', 'csrf', 'noCache'];
+
+	for (_i = 0, _len = avaliableInterceptors.length; _i < _len; _i++) {
+	  interceptor = avaliableInterceptors[_i];
+	  client.interceptors[interceptor] = __webpack_require__(4)("./" + interceptor);
+	}
 
 	window.client = client;
+
+	mime = __webpack_require__(5);
+
+	noCache = __webpack_require__(6);
+
+	client = client.wrap(mime).wrap(noCache);
 
 	client('/test.json').done(function(res) {
 	  return typeof console !== "undefined" && console !== null ? console.log(res) : void 0;
@@ -93,15 +106,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Q = __webpack_require__(1);
 
-	client = __webpack_require__(5);
+	client = __webpack_require__(7);
 
-	UrlBuilder = __webpack_require__(6);
+	UrlBuilder = __webpack_require__(8);
 
-	misc = __webpack_require__(7);
+	misc = __webpack_require__(16);
 
 	normalizeHeaderName = misc.normalizeHeaderName;
 
-	responsePromise = __webpack_require__(8);
+	responsePromise = __webpack_require__(17);
 
 	headerSplitRE = /[\r|\n]+/;
 
@@ -214,6 +227,44 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var map = {
+		"./basicAuth": 9,
+		"./basicAuth.coffee": 9,
+		"./csrf": 10,
+		"./csrf.js": 10,
+		"./errorCode": 11,
+		"./errorCode.js": 11,
+		"./jsonp": 12,
+		"./jsonp.coffee": 12,
+		"./mime": 5,
+		"./mime.js": 5,
+		"./noCache": 6,
+		"./noCache.coffee": 6,
+		"./pathPrefix": 13,
+		"./pathPrefix.js": 13,
+		"./retry": 14,
+		"./retry.js": 14,
+		"./timeout": 15,
+		"./timeout.coffee": 15
+	};
+	function webpackContext(req) {
+		return __webpack_require__(webpackContextResolve(req));
+	};
+	function webpackContextResolve(req) {
+		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
+	};
+	webpackContext.keys = function webpackContextKeys() {
+		return Object.keys(map);
+	};
+	webpackContext.resolve = webpackContextResolve;
+	module.exports = webpackContext;
+	webpackContext.id = 4;
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*
 	 * Copyright 2012-2014 the original author or authors
 	 * @license MIT, see LICENSE.txt for details
@@ -228,9 +279,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 			var interceptor, mime, registry, noopConverter, Q;
 
-			interceptor = __webpack_require__(9);
-			mime = __webpack_require__(10);
-			registry = __webpack_require__(11);
+			interceptor = __webpack_require__(18);
+			mime = __webpack_require__(19);
+			registry = __webpack_require__(20);
 			Q = __webpack_require__(1);
 
 			noopConverter = {
@@ -321,13 +372,33 @@ return /******/ (function(modules) { // webpackBootstrap
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 	}(
-		__webpack_require__(13)
+		__webpack_require__(22)
 		// Boilerplate for AMD and Node
 	));
 
 
 /***/ },
-/* 5 */
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $, interceptor;
+
+	interceptor = __webpack_require__(18);
+
+	$ = __webpack_require__(2);
+
+	module.exports = interceptor({
+	  request: function(request, config) {
+	    $.extend(request.ajaxConfig, {
+	      cache: false
+	    });
+	    return request;
+	  }
+	});
+
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(impl, target) {
@@ -344,7 +415,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -363,7 +434,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 			var mixin, origin, urlRE, absoluteUrlRE, fullyQualifiedUrlRE;
 
-			mixin = __webpack_require__(12);
+			mixin = __webpack_require__(21);
 
 			urlRE = /([a-z][a-z0-9\+\-\.]*:)\/\/([^@]+@)?(([^:\/]+)(:([0-9]+))?)?(\/[^?#]*)?(\?[^#]*)?(#\S*)?/i;
 			absoluteUrlRE = /^([a-z][a-z0-9\-\+\.]*:\/\/|\/)/i;
@@ -572,14 +643,284 @@ return /******/ (function(modules) { // webpackBootstrap
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 	}(
-		__webpack_require__(13),
+		__webpack_require__(22),
 		typeof window !== 'undefined' ? window.location : void 0
 		// Boilerplate for AMD and Node
 	));
 
 
 /***/ },
-/* 7 */
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*
+	 * Copyright 2013 the original author or authors
+	 * @license MIT, see LICENSE.txt for details
+	 *
+	 * @author Scott Andrews
+	 */
+
+	(function (define) {
+		'use strict';
+
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+			var interceptor;
+
+			interceptor = __webpack_require__(18);
+
+			/**
+			 * Applies a Cross-Site Request Forgery protection header to a request
+			 *
+			 * CSRF protection helps a server verify that a request came from a 
+			 * trusted  client and not another client that was able to masquerade
+			 * as an authorized client. Sites that use cookie based authentication
+			 * are particularly vulnerable to request forgeries without extra
+			 * protection.
+			 *
+			 * @see http://en.wikipedia.org/wiki/Cross-site_request_forgery
+			 *
+			 * @param {Client} [client] client to wrap
+			 * @param {string} [config.name='X-Csrf-Token'] name of the request
+			 *   header, may be overridden by `request.csrfTokenName`
+			 * @param {string} [config.token] CSRF token, may be overridden by
+			 *   `request.csrfToken`
+			 *
+			 * @returns {Client}
+			 */
+			return interceptor({
+				init: function (config) {
+					config.name = config.name || 'X-Csrf-Token';
+					return config;
+				},
+				request: function handleRequest(request, config) {
+					var headers, name, token;
+
+					headers = request.headers || (request.headers = {});
+					name = request.csrfTokenName || config.name;
+					token = request.csrfToken || config.token;
+
+					if (token) {
+						headers[name] = token;
+					}
+
+					return request;
+				}
+			});
+
+		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+	}(
+		__webpack_require__(22)
+		// Boilerplate for AMD and Node
+	));
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*
+	 * Copyright 2012-2013 the original author or authors
+	 * @license MIT, see LICENSE.txt for details
+	 *
+	 * @author Scott Andrews
+	 */
+
+	(function (define) {
+		'use strict';
+
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+			var interceptor, q;
+
+			interceptor = __webpack_require__(18);
+			Q = __webpack_require__(1);
+
+			/**
+			 * Rejects the response promise based on the status code.
+			 *
+			 * Codes greater than or equal to the provided value are rejected.  Default
+			 * value 400.
+			 *
+			 * @param {Client} [client] client to wrap
+			 * @param {number} [config.code=400] code to indicate a rejection
+			 *
+			 * @returns {Client}
+			 */
+			return interceptor({
+				init: function (config) {
+					config.code = config.code || 400;
+					return config;
+				},
+				response: function (response, config) {
+					if (response.status && response.status.code >= config.code) {
+						return Q.reject(response);
+					}
+					return response;
+				}
+			});
+
+		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+	}(
+		__webpack_require__(22)
+		// Boilerplate for AMD and Node
+	));
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*
+	 * Copyright 2012-2013 the original author or authors
+	 * @license MIT, see LICENSE.txt for details
+	 *
+	 * @author Scott Andrews
+	 */
+
+	(function (define) {
+		'use strict';
+
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+			var interceptor, UrlBuilder;
+
+			interceptor = __webpack_require__(18);
+			UrlBuilder = __webpack_require__(8);
+
+			function startsWith(str, prefix) {
+				return str.indexOf(prefix) === 0;
+			}
+
+			function endsWith(str, suffix) {
+				return str.lastIndexOf(suffix) + suffix.length === str.length;
+			}
+
+			/**
+			 * Prefixes the request path with a common value.
+			 *
+			 * @param {Client} [client] client to wrap
+			 * @param {number} [config.prefix] path prefix
+			 *
+			 * @returns {Client}
+			 */
+			return interceptor({
+				request: function (request, config) {
+					var path;
+
+					if (config.prefix && !(new UrlBuilder(request.path).isFullyQualified())) {
+						path = config.prefix;
+						if (request.path) {
+							if (!endsWith(path, '/') && !startsWith(request.path, '/')) {
+								// add missing '/' between path sections
+								path += '/';
+							}
+							path += request.path;
+						}
+						request.path = path;
+					}
+
+					return request;
+				}
+			});
+
+		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+	}(
+		__webpack_require__(22)
+		// Boilerplate for AMD and Node
+	));
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*
+	 * Copyright 2012-2014 the original author or authors
+	 * @license MIT, see LICENSE.txt for details
+	 *
+	 * @author Jeremy Grelle
+	 * @author Scott Andrews
+	 */
+
+	(function (define) {
+		'use strict';
+
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+			var interceptor, Q;
+
+			interceptor = __webpack_require__(18);
+			Q = __webpack_require__(1);
+
+			/**
+			 * Retries a rejected request using an exponential backoff.
+			 *
+			 * Defaults to an initial interval of 100ms, a multiplier of 2, and no max interval.
+			 *
+			 * @param {Client} [client] client to wrap
+			 * @param {number} [config.intial=100] initial interval in ms
+			 * @param {number} [config.multiplier=2] interval multiplier
+			 * @param {number} [config.max] max interval in ms
+			 *
+			 * @returns {Client}
+			 */
+			return interceptor({
+				init: function (config) {
+					config.initial = config.initial || 100;
+					config.multiplier = config.multiplier || 2;
+					config.max = config.max || Infinity;
+					return config;
+				},
+				error: function (response, config, meta) {
+					var request;
+
+					request = response.request;
+					request.retry = request.retry || config.initial;
+
+					return Q(request).delay(request.retry).then(function (request) {
+						if (request.canceled) {
+							// cancel here in case client doesn't check canceled flag
+							return Q.reject({ request: request, error: 'precanceled' });
+						}
+						request.retry = Math.min(request.retry * config.multiplier, config.max);
+						return meta.client(request);
+					});
+				}
+			});
+		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+	}(
+		__webpack_require__(22)
+		// Boilerplate for AMD and Node
+	));
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+
+
+/***/ },
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $;
@@ -609,7 +950,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Q, entity, follow, header, headers, make, misc, property, responsePromise, status,
@@ -617,7 +958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Q = __webpack_require__(1);
 
-	misc = __webpack_require__(7);
+	misc = __webpack_require__(16);
 
 	$ = __webpack_require__(2);
 
@@ -730,14 +1071,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, ComplexRequest, Q, ajaxClient, client, defaultInitHandler, defaultRequestHandler, defaultResponseHandler, interceptor, mixin, race, responsePromise;
 
-	responsePromise = __webpack_require__(8);
+	responsePromise = __webpack_require__(17);
 
-	client = __webpack_require__(5);
+	client = __webpack_require__(7);
 
 	Q = __webpack_require__(1);
 
@@ -745,7 +1086,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	$ = __webpack_require__(2);
 
-	mixin = __webpack_require__(12);
+	mixin = __webpack_require__(21);
 
 	defaultInitHandler = function(config) {
 	  return config;
@@ -762,7 +1103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	race = function(promisesOrValues) {
 	  return new Q.Promise(function(resolve, reject) {
 	    return $.each(promisesOrValues, function(promiseOrValue) {
-	      return Q(promiseOrValue, resolve, reject);
+	      return Q(promiseOrValue).then(resolve, reject);
 	    });
 	  });
 	};
@@ -781,7 +1122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  requestHandler = handlers.request || defaultRequestHandler;
 	  successResponseHandler = handlers.success || handlers.response || defaultResponseHandler;
 	  errorResponseHandler = handlers.error || function() {
-	    return Q((handlers.response || defaultResponseHandler).apply(this, arguments), Q.reject, Q.reject);
+	    return Q((handlers.response || defaultResponseHandler).apply(this, arguments)).then(Q.reject, Q.reject);
 	  };
 	  return function(target, config) {
 	    var interceptedClient;
@@ -803,6 +1144,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        path: request
 	      } : request || {};
 	      request.originator = request.originator || interceptedClient;
+	      request.ajaxConfig = request.ajaxConfig || {};
 	      return responsePromise(requestHandler.call(context, request, config, meta), function(request) {
 	        var abort, next, response;
 	        next = target;
@@ -841,7 +1183,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -894,13 +1236,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 	}(
-		__webpack_require__(13)
+		__webpack_require__(22)
 		// Boilerplate for AMD and Node
 	));
 
 
 /***/ },
-/* 11 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -917,7 +1259,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 			var mime, Q, registry;
 
-			mime = __webpack_require__(10);
+			mime = __webpack_require__(19);
 			Q = __webpack_require__(1);
 
 			function Registry(mimes) {
@@ -1004,10 +1346,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			// include provided serializers
 			// TODO: hal support disabled
 			//registry.register('application/hal', require('./type/application/hal'));
-			registry.register('application/json', __webpack_require__(14));
-			registry.register('application/x-www-form-urlencoded', __webpack_require__(15));
-			registry.register('multipart/form-data', __webpack_require__(16));
-			registry.register('text/plain', __webpack_require__(17));
+			registry.register('application/json', __webpack_require__(23));
+			registry.register('application/x-www-form-urlencoded', __webpack_require__(24));
+			registry.register('multipart/form-data', __webpack_require__(25));
+			registry.register('text/plain', __webpack_require__(26));
 
 			registry.register('+json', registry.delegate('application/json'));
 
@@ -1016,13 +1358,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 	}(
-		__webpack_require__(13)
+		__webpack_require__(22)
 		// Boilerplate for AMD and Node
 	));
 
 
 /***/ },
-/* 12 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var empty;
@@ -1049,14 +1391,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function() { throw new Error("define cannot be used indirect"); };
 
 
 /***/ },
-/* 14 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -1103,13 +1445,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 	}(
-		__webpack_require__(13)
+		__webpack_require__(22)
 		// Boilerplate for AMD and Node
 	));
 
 
 /***/ },
-/* 15 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -1199,13 +1541,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 	}(
-		__webpack_require__(13)
+		__webpack_require__(22)
 		// Boilerplate for AMD and Node
 	));
 
 
 /***/ },
-/* 16 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -1278,13 +1620,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 	}(
-		__webpack_require__(13)
+		__webpack_require__(22)
 		// Boilerplate for AMD and Node
 	));
 
 
 /***/ },
-/* 17 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -1313,7 +1655,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 	}(
-		__webpack_require__(13)
+		__webpack_require__(22)
 		// Boilerplate for AMD and Node
 	));
 
