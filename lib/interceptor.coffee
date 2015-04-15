@@ -61,6 +61,8 @@ interceptor = (handlers) ->
 
 			request.ajaxConfig = request.ajaxConfig or {}
 
+			request.headers = request.headers or {}
+
 			return responsePromise(
 				requestHandler.call(context, request, config, meta),
 				(request) ->

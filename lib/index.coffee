@@ -17,3 +17,4 @@ for interceptor in avaliableInterceptors
 	client.interceptors[interceptor] = require('./interceptor/' + interceptor)
 
 client.interceptors.mime.registry = require('./mime/registry')
+client.interceptor = require('./interceptor')

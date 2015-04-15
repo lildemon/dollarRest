@@ -80,7 +80,7 @@ module.exports = client (request) ->
 			#mimeType: null # zepto: mimeType (default: none): override the MIME type of the response
 			xhrFields: request.mixin
 
-			# TODO better define zepto and jquery's content-type header override behavior
+			# TODO better define zepto and jquery's content-type header override behavior, using 'text' for zepto cause zepto to override Content-Type header with which mime intercepter won't get the actual one from server
 			dataType: if $.zepto then 'raw' else 'text' # use mime intercepter, $.ajax currently only handles text response
 			beforeSend: (xhr, settings) ->
 				response.raw = xhr
